@@ -1,0 +1,2 @@
+# Базовый пакет пайплайна. Полная установка — см. README (PyTorch/CUDA, COLMAP, FFmpeg).
+nerfstudio

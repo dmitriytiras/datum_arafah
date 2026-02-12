@@ -1,0 +1,41 @@
+# Input media (large files; keep only structure in git)
+input/*.mp4
+input/*.MOV
+input/*.mov
+input/*.avi
+input/*.mkv
+input/*.webm
+input/*.jpg
+input/*.jpeg
+input/*.png
+!input/.gitkeep
+
+# Nerfstudio / pipeline
+outputs/
+datasets/
+*.ply
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+.venv/
+venv/
+env/
+.conda/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
