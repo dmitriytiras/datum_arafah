@@ -13,6 +13,16 @@
 
 ## Установка окружения
 
+**Вариант A: venv в проекте** (уже создан в `.venv/`)  
+Активируйте и при необходимости доустановите пакеты:
+```bash
+source .venv/bin/activate
+pip install --upgrade pip && pip install torch torchvision nerfstudio
+```
+Скрипт `./run.sh` сам подхватит `.venv`, если не активировать окружение вручную.
+
+**Вариант B: Conda**
+
 1. **Conda и окружение**
 
    ```bash
@@ -39,7 +49,7 @@
 
 4. **COLMAP**
 
-   - macOS: `brew install colmap` или через [vcpkg](https://github.com/microsoft/vcpkg)  
+   - macOS: `brew install colmap`  
    - Linux: `conda install -c conda-forge colmap` или с [сайта COLMAP](https://colmap.github.io/)
 
 5. **FFmpeg**

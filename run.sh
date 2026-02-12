@@ -4,6 +4,8 @@
 
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Используем venv проекта, если есть
+[[ -d "${SCRIPT_DIR}/.venv/bin" ]] && export PATH="${SCRIPT_DIR}/.venv/bin:${PATH}"
 INPUT_DIR="${SCRIPT_DIR}/input"
 DATASET_DIR="${SCRIPT_DIR}/datasets/arafat"
 OUTPUT_DIR="${SCRIPT_DIR}/outputs"
@@ -19,7 +21,7 @@ echo "  outputs: ${OUTPUT_DIR}"
 echo ""
 
 # Проверка зависимостей
-command -v ns-process-data >/dev/null 2>&1 || { echo "Ошибка: nerfstudio не найден. Установите: pip install nerfstudio (в conda env)."; exit 1; }
+command -v ns-process-data >/dev/null 2>&1 || { echo "Ошибка: nerfstudio не найден. Активируйте .venv: source .venv/bin/activate или установите: pip install nerfstudio."; exit 1; }
 command -v ns-train    >/dev/null 2>&1 || { echo "Ошибка: ns-train не найден. Установите nerfstudio."; exit 1; }
 command -v colmap     >/dev/null 2>&1 || { echo "Ошибка: COLMAP не найден. Установите COLMAP (см. README)."; exit 1; }
 command -v ffmpeg     >/dev/null 2>&1 || { echo "Ошибка: FFmpeg не найден. Установите FFmpeg."; exit 1; }
