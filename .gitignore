@@ -1,13 +1,5 @@
-# Input media (large files; keep only structure in git)
-input/*.mp4
-input/*.MOV
-input/*.mov
-input/*.avi
-input/*.mkv
-input/*.webm
-input/*.jpg
-input/*.jpeg
-input/*.png
+# Input media — ничего из input/ не коммитим (фото, видео, архивы)
+input/*
 !input/.gitkeep
 
 # Nerfstudio / pipeline

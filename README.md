@@ -4,6 +4,17 @@
 
 **Один запуск:** положите материалы в `input/`, выполните команду — получите сцену и откроете её во вьювере.
 
+## Запуск локально (CPU)
+
+По умолчанию пайплайн рассчитан на **локальный запуск без GPU**: COLMAP и обучение идут на CPU. Используется **Nerfacto** (NeRF) — он работает без CUDA. **Splatfacto** (3D Gaussian Splatting) требует GPU (библиотека gsplat только с CUDA); его имеет смысл запускать на GCE VM с GPU. На CPU обучение будет дольше, но сцену можно посмотреть и оценить.
+
+1. Установите окружение (см. ниже) — Python, Nerfstudio, COLMAP, FFmpeg.
+2. Положите фото или видео в `input/`.
+3. Выполните: `./run.sh`
+4. Откройте вьювер: **http://localhost:7007**
+
+Развёртывание на GPU в Google Cloud (отдельный проект, квоты) — см. раздел в конце README и [docs/DEPLOY_GCP_GPU.md](docs/DEPLOY_GCP_GPU.md), когда будете готовы.
+
 ## Требования
 
 - **Python** 3.8+ (рекомендуется conda)
@@ -13,13 +24,14 @@
 
 ## Установка окружения
 
-**Вариант A: venv в проекте** (уже создан в `.venv/`)  
-Активируйте и при необходимости доустановите пакеты:
+**Вариант A: venv в проекте (локально, CPU)**  
+Активируйте и при необходимости доустановите пакеты (PyTorch без CUDA — для CPU):
 ```bash
 source .venv/bin/activate
-pip install --upgrade pip && pip install torch torchvision nerfstudio
+pip install --upgrade pip
+pip install torch torchvision nerfstudio
 ```
-Скрипт `./run.sh` сам подхватит `.venv`, если не активировать окружение вручную.
+Скрипт `./run.sh` сам подхватит `.venv`, если не активировать окружение вручную. COLMAP в скрипте вызывается с `--no-gpu` (подходит для Mac и Linux без NVIDIA).
 
 **Вариант B: Conda**
 
@@ -31,13 +43,13 @@ pip install --upgrade pip && pip install torch torchvision nerfstudio
    python -m pip install --upgrade pip
    ```
 
-2. **PyTorch с CUDA** (если есть GPU)
+2. **PyTorch** (для локального CPU — без CUDA)
 
    ```bash
-   pip install torch==2.1.2 torchvision==0.16.2 --index-url https://download.pytorch.org/whl/cu118
+   pip install torch torchvision
    ```
 
-   Для CPU или другой версии CUDA см. [официальную установку Nerfstudio](https://docs.nerf.studio/quickstart/installation.html).
+   Для GPU с CUDA см. [официальную установку Nerfstudio](https://docs.nerf.studio/quickstart/installation.html) (cu118/cu121 и т.д.).
 
 3. **Nerfstudio**
 
@@ -100,6 +112,8 @@ pip install --upgrade pip && pip install torch torchvision nerfstudio
   NUM_FRAMES_TARGET=300 ./run.sh
   ```
 
+- **`METHOD`** — метод обучения: `nerfacto` (по умолчанию, работает на CPU) или `splatfacto` (3DGS, только с GPU/CUDA). На VM с GPU можно запускать с `METHOD=splatfacto`.
+
 ## Структура проекта
 
 ```
@@ -116,6 +130,16 @@ datum_arafah/
 - Разнообразие ракурсов важнее количества кадров под одним углом.
 - Для сложных/длинных видео можно увеличить `NUM_FRAMES_TARGET` или уменьшить FPS вручную (через отдельный вызов `ffmpeg` и `ns-process-data images`).
 - Если COLMAP находит мало совпадений, попробуйте меньше кадров или отфильтровать размытые кадры.
+
+## Позже: развёртывание на GCE с GPU
+
+Когда будет настроен отдельный GCP-проект и квоты на GPU, можно поднять VM (NVIDIA L4, параметры как в **datum_production_platform**) и запускать пайплайн там:
+
+1. Создать VM: `export GCP_PROJECT_ID=your-project && bash scripts/create-gce-gpu-vm.sh`
+2. На VM один раз: `scripts/setup-vm-nerfstudio.sh`
+3. Запуск: `scripts/run-on-gpu-vm.sh` или вручную по SSH
+
+Подробно: [docs/DEPLOY_GCP_GPU.md](docs/DEPLOY_GCP_GPU.md).
 
 ## Ссылки
 

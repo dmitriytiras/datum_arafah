@@ -77,28 +77,36 @@ mkdir -p "$OUTPUT_DIR"
 # Шаг 1: подготовка датасета (COLMAP + кадры)
 echo ""
 echo "--- Шаг 1/2: подготовка датасета (ns-process-data) ---"
+# COLMAP: --no-gpu (Homebrew без CUDA); exhaustive — без vocab tree (новый COLMAP перешёл на FAISS, старый vocab не подходит)
 if [[ "$MODE" == "video" ]]; then
   ns-process-data video \
     --data "$DATA_PATH" \
     --output-dir "$DATASET_DIR" \
-    --num-frames-target "$NUM_FRAMES_TARGET"
+    --num-frames-target "$NUM_FRAMES_TARGET" \
+    --no-gpu
 else
   ns-process-data images \
     --data "$DATA_PATH" \
-    --output-dir "$DATASET_DIR"
+    --output-dir "$DATASET_DIR" \
+    --no-gpu \
+    --matching-method exhaustive
 fi
 
-# Шаг 2: обучение Splatfacto и запуск вьювера
+# Шаг 2: обучение и вьювер
+# Локально на CPU: Nerfacto (NeRF). Splatfacto (3DGS) требует CUDA/gsplat — используйте на VM с GPU.
 echo ""
-echo "--- Шаг 2/2: обучение 3DGS (splatfacto) и вьювер ---"
+echo "--- Шаг 2/2: обучение (nerfacto на CPU) и вьювер ---"
 echo "После старта откройте в браузере: http://localhost:7007"
 echo ""
 
-ns-train splatfacto \
+# На CPU: nerfacto. Для 3DGS на GPU задайте METHOD=splatfacto и устройство cuda (например на GCE).
+METHOD="${METHOD:-nerfacto}"
+ns-train "$METHOD" \
   --data "$DATASET_DIR" \
   --output-dir "$OUTPUT_DIR" \
-  --experiment-name "$SCENE_NAME"
+  --experiment-name "$SCENE_NAME" \
+  --machine.device-type cpu
 
 echo ""
-echo "Готово. Чекпоинты: ${OUTPUT_DIR}/${SCENE_NAME}"
+echo "Готово ($METHOD). Чекпоинты: ${OUTPUT_DIR}/${SCENE_NAME}"
 echo "Повторно открыть вьювер: ns-viewer --load-config <путь к config.yml из outputs>"
