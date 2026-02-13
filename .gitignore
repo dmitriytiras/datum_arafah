@@ -26,7 +26,11 @@ env/
 
 # OS
 .DS_Store
+._*
 Thumbs.db
+
+# Local backup (can remove after comparing with repo)
+_backup_before_main/
 
 # Logs
 *.log
